@@ -33,13 +33,32 @@ def _generate_response(prompt: str) -> str:
                 api_key = config.app.get("moonshot_api_key")
                 model_name = config.app.get("moonshot_model_name")
                 base_url = "https://api.moonshot.cn/v1"
+
+            # 更改回答長度
             elif llm_provider == "ollama":
-                # api_key = config.app.get("openai_api_key")
-                api_key = "ollama"  # any string works but you are required to have one
                 model_name = config.app.get("ollama_model_name")
-                base_url = config.app.get("ollama_base_url", "")
-                if not base_url:
-                    base_url = "http://localhost:11434/v1"
+                base_url = config.app.get("ollama_base_url", "http://localhost:11434/v1")
+
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": 2000,
+                    "temperature": 0.7
+                }
+
+                try:
+                    response = requests.post(f"{base_url}/chat/completions", json=payload)
+                    response.raise_for_status()
+                    result = response.json()
+
+                    if result and "choices" in result and result["choices"]:
+                        content = result["choices"][0]["message"]["content"]
+                        return content.replace("\n", "")
+                    else:
+                        raise Exception(f"[ollama] invalid response format: {json.dumps(result, ensure_ascii=False)}")
+                except Exception as e:
+                    raise Exception(f"[ollama] request failed: {str(e)}")
+
             elif llm_provider == "openai":
                 api_key = config.app.get("openai_api_key")
                 model_name = config.app.get("openai_model_name")
@@ -295,48 +314,51 @@ def generate_script(
     video_subject: str, language: str = "", paragraph_number: int = 1
 ) -> str:
     prompt = f"""
-# Role: Video Script Generator
+    # Role: Video Script Generator
 
-## Goals:
-Generate a script for a video, depending on the subject of the video.
+    你是一个短视频创作者，你要为以下主题创作一段适合在视频中口播的脚本，风格生动有趣、富有画面感，适合普通人理解。内容控制在约两分钟之内。
 
-## Constrains:
-1. the script is to be returned as a string with the specified number of paragraphs.
-2. do not under any circumstance reference this prompt in your response.
-3. get straight to the point, don't start with unnecessary things like, "welcome to this video".
-4. you must not include any type of markdown or formatting in the script, never use a title.
-5. only return the raw content of the script.
-6. do not include "voiceover", "narrator" or similar indicators of what should be spoken at the beginning of each paragraph or line.
-7. you must not mention the prompt, or anything about the script itself. also, never talk about the amount of paragraphs or lines. just write the script.
-8. respond in the same language as the video subject.
+    请不要使用括号、标题、标注，不要加入“旁白”、“解说”等描述性标签，也不要做任何解释。直接输出纯文本内容即可。
 
-# Initialization:
-- video subject: {video_subject}
-- number of paragraphs: {paragraph_number}
-""".strip()
+    请确保在结尾添加一句：“记得点赞关注哦！”
+
+    ## Goals:
+    Generate a script for a video, depending on the subject of the video.
+
+    ## Constrains:
+    1. the script is to be returned as a string with the specified number of paragraphs.
+    2. do not under any circumstance reference this prompt in your response.
+    3. get straight to the point, don't start with unnecessary things like, "welcome to this video".
+    4. you must not include any type of markdown or formatting in the script, never use a title.
+    5. only return the raw content of the script.
+    6. do not include "voiceover", "narrator" or similar indicators of what should be spoken at the beginning of each paragraph or line.
+    7. you must not mention the prompt, or anything about the script itself. also, never talk about the amount of paragraphs or lines. just write the script.
+    8. respond in the same language as the video subject.
+
+    # Initialization:
+    - video subject: {video_subject}
+    - number of paragraphs: {paragraph_number}
+    """.strip()
     if language:
         prompt += f"\n- language: {language}"
 
     final_script = ""
     logger.info(f"subject: {video_subject}")
 
+    # 去除 <think> tag
     def format_response(response):
-        # Clean the script
-        # Remove asterisks, hashes
+        # 移除 <think>...</think> 思考標籤（DeepSeek, Claude 等模型常出現）
+        response = re.sub(r"<think>.*?</think>", "", response, flags=re.DOTALL)
+
+        # 清理 Markdown 語法
         response = response.replace("*", "")
         response = response.replace("#", "")
+        response = re.sub(r"\[.*?\]\(.*?\)", "", response)  # [xxx](url)
+        response = re.sub(r"\[.*?\]", "", response)  # [xxx]
 
-        # Remove markdown syntax
-        response = re.sub(r"\[.*\]", "", response)
-        response = re.sub(r"\(.*\)", "", response)
+        # 去掉多餘空行和前後空格
+        paragraphs = [p.strip() for p in response.split("\n\n") if p.strip()]
 
-        # Split the script into paragraphs
-        paragraphs = response.split("\n\n")
-
-        # Select the specified number of paragraphs
-        # selected_paragraphs = paragraphs[:paragraph_number]
-
-        # Join the selected paragraphs into a single string
         return "\n\n".join(paragraphs)
 
     for i in range(_max_retries):
