@@ -11,7 +11,7 @@ from app.config import config
 from app.models import const
 from app.models.schema import VideoConcatMode, VideoParams
 from app.services import llm, material, subtitle, video, voice
-from app.services.thumbnail import extract_first_frame
+from app.services.thumbnail import overlay_title_on_first_frame
 from app.services import state as sm
 from app.utils import utils
 
@@ -204,7 +204,7 @@ def generate_final_videos(task_id, params, downloaded_videos, audio_file, subtit
         combined_video_paths.append(combined_video)
 
         # 3) 提取首帧生成缩略图
-        thumb = extract_first_frame(final_video)
+        thumb = overlay_title_on_first_frame(final_video)
         if thumb:
             thumbnail_paths.append(thumb)
 

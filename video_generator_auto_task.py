@@ -49,17 +49,17 @@ def build_video_params(subject: str) -> VideoParams:
         video_source="pexels",
         video_concat_mode=VideoConcatMode.sequential,
         video_transition_mode=VideoTransitionMode.none,
-        video_aspect=VideoAspect.portrait,
-        video_clip_duration=5,
+        video_aspect=VideoAspect.landscape,
+        video_clip_duration=10,
         video_count=1,
         voice_name="zh-CN-XiaoxiaoNeural",
         voice_volume=1.0,
-        voice_rate=1.2,
+        voice_rate=1.4,
         bgm_type="random",
         bgm_volume=0.2,
         subtitle_enabled=True,
-        font_name="MicrosoftYaHeiBold.ttc",
-        font_size=65,
+        font_name="ZiHunBianTaoTi-2.ttf",
+        font_size=75,
         text_fore_color="#FFFF00",
         stroke_color="#000000",
         stroke_width=1.5,
@@ -97,7 +97,7 @@ def main():
     logger.info("=== 开始批量生成短视频任务 ===")
     pending_tasks = [(idx, subject) for idx, subject in enumerate(all_tasks, 1) if subject not in completed]
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = [executor.submit(process_task, subject, idx) for idx, subject in pending_tasks]
         for future in as_completed(futures):
             try:

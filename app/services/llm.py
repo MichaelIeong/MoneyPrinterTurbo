@@ -42,7 +42,7 @@ def _generate_response(prompt: str) -> str:
                 payload = {
                     "model": model_name,
                     "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 2000,
+                    "max_tokens": 10000,
                     "temperature": 0.7
                 }
 
@@ -311,35 +311,38 @@ def _generate_response(prompt: str) -> str:
 
 
 def generate_script(
-    video_subject: str, language: str = "", paragraph_number: int = 1
+    video_subject: str, language: str = "", paragraph_number: int = 5
 ) -> str:
     prompt = f"""
-    # Role: Video Script Generator
+    # 角色：视频脚本创作者
 
-    你是一个短视频创作者，需要为以下主题撰写一段简洁易懂、富有“营养”的口播脚本，时长控制在两分钟以内。  
-    脚本应帮助观众快速抓住核心概念，辅以1–2个实例或数据，增强说服力。
-    
-    请在开头复述一遍视频标题。  
-    请在结尾添加一句：“记得点赞关注知识直通车！”
+    请为以下主题撰写一段简洁明了、内容充实的口播脚本，时长控制在七分钟以内，约2000字，避免内容过短。
+    脚本应帮助观众快速理解核心观点，并结合1–2个具体案例或数据，增强说服力和可信度。
+
+    请务必在开头复述一遍视频标题，仅需口语复述，不要任何书名号。  
+    请务必在结尾添加一句：“记得点赞关注知识直通车！”
     
     ## 目标：  
     根据视频主题生成脚本。
     
-    ## 限制：  
-    1. 按指定段落数返回，段落间空行分隔。  
-    2. 绝不引用本提示词。  
-    3. 直奔主题，不要“欢迎来到本视频”等开场白。  
-    4. 不含 Markdown、标题或格式标记，只返回纯文本。  
-    5. 不加“旁白”“解说”等标签。  
-    6. 不提及提示或脚本结构，不说明段落数或行数。  
-    7. 使用与视频主题相同的语言。  
+    ## 限制：
+    - 开头口语复述视频标题，不使用书名号，仅简洁表达。
+    - 结尾加上一句：“记得点赞关注知识直通车！”
+    - 按指定段落数分段，段落间用空行隔开。
+    - 不引用本提示内容。
+    - 直接进入主题，不使用诸如“欢迎观看本视频”的开场白。
+    - 返回纯文本，不包含 Markdown、标题、标签或格式标记。
+    - 不出现“旁白”“解说”等标签。
+    - 不提及提示词或脚本结构，也不说明段落数或行数。
+    - 使用中文，避免英文词汇。
+    - 确保开头5秒内吸引观众注意，减少冗长的介绍。
 
-    # Initialization:
-    - video subject: {video_subject}
-    - number of paragraphs: {paragraph_number}
+    # 参数初始化：
+    - 视频主题: {video_subject}
+    - 段落数: {paragraph_number}
     """.strip()
     if language:
-        prompt += f"\n- language: {language}"
+        prompt += f"\n- 语言: {language}"
 
     final_script = ""
     logger.info(f"subject: {video_subject}")
