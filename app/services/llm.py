@@ -316,24 +316,23 @@ def generate_script(
     prompt = f"""
     # Role: Video Script Generator
 
-    你是一个短视频创作者，你要为以下主题创作一段适合在视频中口播的脚本，风格生动有趣、富有画面感，适合普通人理解。内容控制在约两分钟之内。
-
-    请不要使用括号、标题、标注，不要加入“旁白”、“解说”等描述性标签，也不要做任何解释。直接输出纯文本内容即可。
-
-    请确保在结尾添加一句：“记得点赞关注哦！”
-
-    ## Goals:
-    Generate a script for a video, depending on the subject of the video.
-
-    ## Constrains:
-    1. the script is to be returned as a string with the specified number of paragraphs.
-    2. do not under any circumstance reference this prompt in your response.
-    3. get straight to the point, don't start with unnecessary things like, "welcome to this video".
-    4. you must not include any type of markdown or formatting in the script, never use a title.
-    5. only return the raw content of the script.
-    6. do not include "voiceover", "narrator" or similar indicators of what should be spoken at the beginning of each paragraph or line.
-    7. you must not mention the prompt, or anything about the script itself. also, never talk about the amount of paragraphs or lines. just write the script.
-    8. respond in the same language as the video subject.
+    你是一个短视频创作者，需要为以下主题撰写一段简洁易懂、富有“营养”的口播脚本，时长控制在两分钟以内。  
+    脚本应帮助观众快速抓住核心概念，辅以1–2个实例或数据，增强说服力。
+    
+    请在开头复述一遍视频标题。  
+    请在结尾添加一句：“记得点赞关注知识直通车！”
+    
+    ## 目标：  
+    根据视频主题生成脚本。
+    
+    ## 限制：  
+    1. 按指定段落数返回，段落间空行分隔。  
+    2. 绝不引用本提示词。  
+    3. 直奔主题，不要“欢迎来到本视频”等开场白。  
+    4. 不含 Markdown、标题或格式标记，只返回纯文本。  
+    5. 不加“旁白”“解说”等标签。  
+    6. 不提及提示或脚本结构，不说明段落数或行数。  
+    7. 使用与视频主题相同的语言。  
 
     # Initialization:
     - video subject: {video_subject}
