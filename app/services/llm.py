@@ -42,7 +42,7 @@ def _generate_response(prompt: str) -> str:
                 payload = {
                     "model": model_name,
                     "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 10000,
+                    "max_tokens": 2000,
                     "temperature": 0.7
                 }
 
@@ -314,12 +314,12 @@ def generate_script(
     video_subject: str, language: str = "", paragraph_number: int = 5
 ) -> str:
     prompt = f"""
-    # 角色：视频脚本创作者
+    # 角色：短视频脚本创作者
 
-    请为以下主题撰写一段简洁明了、内容充实的口播脚本，时长控制在七分钟以内，约2000字，避免内容过短。
-    脚本应帮助观众快速理解核心观点，并结合1–2个具体案例或数据，增强说服力和可信度。
+    请为以下主题撰写一段简洁易懂、内容充实的口播脚本，时长控制在一分钟以内，约500字。
+    脚本应帮助观众快速理解核心观点，并结合具体案例或数据，增强说服力和可信度。
 
-    请务必在开头复述一遍视频标题，仅需口语复述，不要任何书名号。  
+    请务必在开头复述一遍视频标题，只需说一遍，说完标题后直入主题。  
     请务必在结尾添加一句：“记得点赞关注知识直通车！”
     
     ## 目标：  
@@ -330,19 +330,19 @@ def generate_script(
     - 结尾加上一句：“记得点赞关注知识直通车！”
     - 按指定段落数分段，段落间用空行隔开。
     - 不引用本提示内容。
-    - 直接进入主题，不使用诸如“欢迎观看本视频”的开场白。
+    - 直接进入主题，不使用诸如“欢迎观看本视频”、“大家好”等开场白。
     - 返回纯文本，不包含 Markdown、标题、标签或格式标记。
     - 不出现“旁白”“解说”等标签。
     - 不提及提示词或脚本结构，也不说明段落数或行数。
-    - 使用中文，避免英文词汇。
-    - 确保开头5秒内吸引观众注意，减少冗长的介绍。
+    - 使用中文，切记避免英文词汇。
+    - 确保开头5秒内吸引观众注意，减少冗长的介绍，直入主题。
 
     # 参数初始化：
     - 视频主题: {video_subject}
     - 段落数: {paragraph_number}
     """.strip()
-    if language:
-        prompt += f"\n- 语言: {language}"
+    # if language:
+    #     prompt += f"\n- 语言: {language}"
 
     final_script = ""
     logger.info(f"subject: {video_subject}")

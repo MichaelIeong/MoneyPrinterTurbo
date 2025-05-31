@@ -204,7 +204,7 @@ def generate_final_videos(task_id, params, downloaded_videos, audio_file, subtit
         combined_video_paths.append(combined_video)
 
         # 3) 提取首帧生成缩略图
-        thumb = overlay_title_on_first_frame(final_video)
+        thumb = overlay_title_on_first_frame(final_video, title=params.video_subject)
         if thumb:
             thumbnail_paths.append(thumb)
 
