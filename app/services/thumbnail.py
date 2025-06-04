@@ -15,7 +15,7 @@ def overlay_title_on_first_frame(
     video_path: str,
     title: str,
     output_path: str = None,
-    max_chars_per_line: int = 6,
+    max_chars_per_line: int = 7,
     fontsize: int = 160,
     fontfile: str = None,
 ) -> str:
